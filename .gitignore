@@ -1,0 +1,87 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# Xcode user data and local source-control metadata
+xcuserdata/
+*.xcuserdatad
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.moved-aside
+
+# Xcode build products and generated diagnostics
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+*.xcarchive
+*.xcresult
+*.xctestrun
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.swiftpm/xcode/xcuserdata/
+
+# Keep Package.resolved under source control for applications.
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+Carthage/Checkouts/
+
+# Common dependency and build-tool caches
+SourcePackages/
+.mint/
+.tuist-cache/
+Tuist/.build/
+Tuist/Dependencies/
+vendor/bundle/
+.bundle/
+
+# Fastlane and test output
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output/
+coverage/
+*.profraw
+*.profdata
+
+# Local configuration and signing material
+.env
+.env.*
+!.env.example
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.pem
+*.key
+
+# Logs and editor temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*~
