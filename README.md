@@ -57,10 +57,16 @@ can permanently lose the journal.
   changes must never silently discard or corrupt captured audio.
 - Store audio files in the app's private container and persist journal metadata
   with SwiftData.
-- Browse entries in a reverse-chronological journal and rename or delete a
-  recording.
-- Play, pause, and seek through recordings with elapsed time, duration, and
-  progress.
+- Browse entries in a reverse-chronological journal grouped by local calendar
+  day. Each row shows the entry title, local time, recording duration, and—when
+  available—a bounded opening excerpt from the accepted transcript plus
+  accepted or user-edited mood and tags. Missing, processing, failed, discarded,
+  or unavailable transcripts use explicit metadata and status fallbacks so
+  browsing never depends on Speech or Apple Intelligence. Users can rename or
+  delete an entry.
+- Open an entry to play, pause, and seek through its recording; review and edit
+  its transcript; and manage optional generated features. Journal rows navigate
+  to entry detail and do not contain playback controls.
 - Show privacy-safe playback information and controls on the Lock Screen and in
   Control Center when permitted by the App Lock policy.
 - Automatically transcribe a completed recording on device with the Speech
@@ -252,19 +258,27 @@ mixing unrelated product work.
 
 #### Phase 5 — Journal Library
 
-1. Display saved entries in reverse chronological order.
-2. Add empty, loading, and recoverable error states.
-3. Build an entry-detail destination with recording metadata.
-4. Add recording renaming.
-5. Add confirmed deletion with complete cleanup of the entry's current direct
+1. Display saved entries in reverse chronological order, grouped by local
+   calendar day with stable ordering and a deterministic tie-breaker.
+2. Build lightweight, accessible navigation rows with an entry title, local
+   time, recording duration, and explicit transcript-state fallback. Reserve
+   optional row presentation for bounded accepted-transcript excerpts and
+   accepted mood and tags added by later phases.
+3. Add empty, loading, and recoverable error states.
+4. Build an entry-detail destination with recording metadata.
+5. Add recording renaming.
+6. Add confirmed deletion with complete cleanup of the entry's current direct
    data.
-6. Test the journal's create, rename, navigation, and delete flows.
+7. Test the journal's ordering, grouping, row fallbacks, create, rename,
+   navigation, and delete flows.
 
 #### Phase 6 — In-app Playback
 
 1. Implement a single source of truth for player state.
 2. Add play, pause, seek, elapsed time, duration, and progress.
-3. Connect playback controls to entry rows and the entry-detail screen.
+3. Start playback from entry detail and keep individual Journal rows free of
+   playback controls. If playback remains active after leaving detail, expose
+   one compact app-level player backed by the same player state.
 4. Pause cleanly and preserve position across calls, system interruptions,
    output-route changes, and switching recordings.
 5. Restore playback only when the system permits it and the documented policy
@@ -302,7 +316,11 @@ mixing unrelated product work.
 2. Add copy, save, retry, and discard actions with clear consequences.
 3. Allow an accepted transcript to be edited again from the entry-detail screen.
 4. Preserve explicit empty, processing, failed, and saved states.
-5. Test editing, copying, saving, discarding, and relaunch restoration.
+5. Show a bounded opening excerpt in the Journal row only after the transcript
+   is accepted, update it after accepted edits, and preserve explicit fallbacks
+   for every other transcript state.
+6. Test editing, copying, saving, discarding, Journal-row updates and fallbacks,
+   and relaunch restoration.
 
 #### Phase 10 — Calendar Browsing
 
@@ -332,8 +350,11 @@ mixing unrelated product work.
 3. Define and implement launch, foreground, and grace-period relocking behavior.
 4. Pause playback, clear Now Playing metadata, and disable external playback
    commands whenever App Lock engages.
-5. Obscure journal content in app-switcher snapshots.
-6. Test active playback, device locking, unavailable biometrics, cancellation,
+5. Replace private Journal and entry-detail content when App Lock engages so
+   titles, transcript excerpts, moods, tags, and other journal data are absent
+   from both the visible interface and accessibility tree.
+6. Keep app-switcher snapshots generic.
+7. Test active playback, device locking, unavailable biometrics, cancellation,
    fallback, and recovery.
 
 #### Phase 13 — On-device Mood and Tag Suggestions
@@ -346,8 +367,11 @@ mixing unrelated product work.
 5. Persist the source transcript revision and model/prompt version.
 6. Invalidate or regenerate suggestions after the source transcript changes or
    its entry is deleted.
-7. Evaluate representative inputs and test unavailable, refused, stale, and
-   failed generations.
+7. Show only accepted or user-edited mood and tags as bounded, noninteractive
+   Journal-row metadata. Keep generation, acceptance, editing, removal, and
+   regeneration in entry detail.
+8. Evaluate representative inputs and test unavailable, refused, stale, and
+   failed generations plus Journal-row bounds and updates.
 
 #### Phase 14 — Per-entry Transcript Summaries
 
