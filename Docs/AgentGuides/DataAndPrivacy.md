@@ -42,6 +42,9 @@ behavior.
 
 ## Privacy and network boundaries
 
+- The app remains iPhone-only. Cloud Backup and cross-device sync between
+  supported iPhones do not authorize an iPadOS target, iPad-specific data path,
+  or iPad test destination.
 - Do not add ads, analytics, tracking, a developer backend, or a required app
   account.
 - Use Apple SDKs only. A third-party dependency requires the user to explicitly

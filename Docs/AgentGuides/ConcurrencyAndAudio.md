@@ -22,6 +22,8 @@ authoritative.
 
 ## Concurrency baseline
 
+- Target iPhone only on iOS 26.0+. Do not add iPadOS support, iPad-specific
+  multiwindow behavior, or iPad-only lifecycle and test paths.
 - Use Swift 6 language mode and retain Swift 6.2 source compatibility.
 - Approachable Concurrency, `InferIsolatedConformances`,
   `NonisolatedNonsendingByDefault`, and app-target default `MainActor` isolation

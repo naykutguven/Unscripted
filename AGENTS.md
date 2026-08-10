@@ -57,7 +57,8 @@ relevant to the task, but read each selected guide completely.
   established architecture.
 - **Project/scheme:** `Unscripted.xcodeproj` / `Unscripted`
 - **Targets:** `Unscripted`, `UnscriptedTests`, `UnscriptedUITests`
-- **Platform:** iPhone, iOS 26.0+. iPad remains later roadmap work.
+- **Platform:** iPhone only, iOS 26.0+. iPad and iPadOS are explicitly
+  unsupported and are not roadmap scope.
 - **Language:** Swift 6 language mode, source-compatible with Swift 6.2.
   `SWIFT_VERSION = 6.0` denotes language mode; never change it to `6.2`.
 - **Concurrency:** Approachable Concurrency and app-target default `MainActor`
@@ -72,6 +73,10 @@ settings, bundle IDs, signing, entitlements, capabilities, background modes, or
 purpose strings unless directly required by the requested behavior. Keep
 necessary configuration minimal and review it as a privacy and App Review
 boundary.
+
+Do not add iPad device-family support, iPadOS destinations, iPad-specific UI or
+tests, Mac Catalyst, or another platform unless the user explicitly changes the
+product's iPhone-only scope.
 
 The current `ContentView`, `Item`, unbounded `@Query`, direct view-side
 `ModelContext` mutation, implicit `ModelConfiguration`, startup `fatalError`, and

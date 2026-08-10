@@ -4,16 +4,17 @@
 > current capabilities of the app. **Unscripted** is a working title; the final App
 > Store name has not been selected.
 
-Unscripted is a private, local-first voice journal launching on iPhone. It turns
-spoken entries into editable transcripts, optional mood and tag suggestions,
-and periodic reflections using Apple frameworks.
+Unscripted is a private, local-first voice journal for iPhone. The product is
+iPhone-only; iPad and iPadOS are not supported or planned. It turns spoken
+entries into editable transcripts, optional mood and tag suggestions, and
+periodic reflections using Apple frameworks.
 
 Unscripted has no ads, analytics, tracking, third-party SDKs, required account, or
 developer-operated backend. Unscripted does not send journal content over the
 network by default. Network access is limited to Apple services for required
 asset downloads, user-initiated StoreKit trial and purchase actions, explicitly
-enabled **Cloud Backup** or future cross-device sync, and explicitly enabled
-Private Cloud Compute.
+enabled **Cloud Backup** or future sync across supported iPhones, and explicitly
+enabled Private Cloud Compute.
 
 Apple-provided speech and intelligence assets may need to be downloaded before
 some on-device features become available. These asset downloads do not upload
@@ -104,10 +105,8 @@ can permanently lose the journal.
 
 ### Version 1.2
 
-- Add an iPad experience with adaptive layouts, keyboard support, and
-  multitasking.
-- After the iPad app is usable, optionally synchronize journal data across the
-  user's devices with CloudKit.
+- Optionally synchronize journal data across the user's supported iPhones with
+  CloudKit.
 
 ### Version 1.3
 
@@ -134,7 +133,7 @@ can permanently lose the journal.
 | Trial and Full Unlock | StoreKit entitlement state on device | App Store services for trial, purchase, and restoration |
 | iOS device backup | Excluded | Eligible only after explicit opt-in; actual backup is controlled by iOS |
 | CloudKit backup and restore | Disabled and post-launch | User's private CloudKit database, only after explicit opt-in |
-| Cross-device sync | Disabled and post-iPad | CloudKit, only after explicit opt-in |
+| Cross-device sync | Disabled until version 1.2 | CloudKit, only after explicit opt-in |
 | Yearly reflection with Private Cloud Compute | Disabled and post-launch | PCC, only after explicit opt-in |
 
 Disabling a network-backed feature must not make the local journal unusable.
@@ -152,15 +151,14 @@ backup.
   versioned recovery generations in the user's private database and provides a
   deliberate restore flow.
 - **Cross-device sync** continuously propagates edits and deletions between
-  active devices. It is a separate, later feature that follows the iPad
-  experience.
+  supported iPhones. It is a separate, later feature from Cloud Backup.
 
 ## Technology
 
 Unscripted uses Apple SDKs only:
 
-- iPhone with iOS 26 or later for version 1.0; iPadOS support is planned for
-  version 1.2
+- iPhone with iOS 26 or later for every release; iPad and iPadOS are not
+  supported
 - Swift 6.2+ in Swift 6 language mode
 - SwiftUI for the interface
 - SwiftData for structured local data
@@ -176,7 +174,7 @@ Unscripted uses Apple SDKs only:
 - StoreKit 2 for the trial, one-time Full Unlock, and purchase restoration
 - ActivityKit and WidgetKit for the post-launch recording Live Activity
 - CloudKit private databases and `CKAsset` for post-launch, opt-in backup and
-  restore, followed later by cross-device sync
+  restore, followed later by sync across supported iPhones
 - Private Cloud Compute for a post-launch, iOS 27+ yearly-reflection enhancement,
   subject to API stability and managed-entitlement eligibility
 - Swift Testing for unit and integration tests, with XCUITest for critical user
@@ -185,6 +183,15 @@ Unscripted uses Apple SDKs only:
 Metal is not a baseline dependency. SwiftUI and system frameworks remain the
 default; Metal will be considered only for a concrete effect that cannot be
 delivered efficiently otherwise.
+
+## User Journey Model
+
+The planned behavior across all roadmap versions is also maintained as one
+release-neutral [user journey and UI-state catalog](Docs/UserJourneys/README.md).
+It maps canonical workflow, loading, permission, unavailable, error,
+cancellation, stale, recovery, and success states to proposed UI and validation
+layers. The catalog follows the permanent iPhone-only platform scope; iPad and
+iPadOS cases are outside the product scope.
 
 ## Roadmap
 
@@ -616,32 +623,9 @@ mixing unrelated product work.
    pass.
 7. Run TestFlight validation and ship version 1.1.
 
-### Version 1.2 — iPad First, Cross-device Sync Second
+### Version 1.2 — Cross-device Sync
 
-#### Phase 31 — iPad Foundation
-
-1. Add iPad as a supported device without raising the existing minimum OS.
-2. Replace iPhone-specific navigation assumptions with adaptive split-view and
-   compact-width patterns.
-3. Keep recording, playback, persistence, transcription, and reflection
-   services independent of screen size and scene ownership.
-4. Define multiwindow rules so two scenes cannot corrupt recorder or player
-   state.
-5. Add iPad test destinations and validate schema compatibility with existing
-   iPhone journals.
-
-#### Phase 32 — iPad Product Experience
-
-1. Adapt the journal, recorder, entry detail, calendar, search, reflections, and
-   settings flows for regular and compact widths.
-2. Add keyboard shortcuts, focus behavior, pointer interactions, and sensible
-   toolbar placement.
-3. Validate portrait, landscape, Split View, Stage Manager, external keyboard,
-   and external audio routes.
-4. Complete iPad accessibility, performance, and physical-device testing.
-5. Make the iPad experience release-quality before beginning continuous sync.
-
-#### Phase 33 — Cross-device Sync Contract and Prototype
+#### Phase 31 — Cross-device Sync Contract and Prototype
 
 1. Define how continuous sync coexists with versioned Cloud Backup without
    duplicating storage or presenting ambiguous controls.
@@ -649,11 +633,11 @@ mixing unrelated product work.
    and disable-sync behavior.
 3. Select and prototype the CloudKit synchronization architecture separately
    from the backup-generation implementation.
-4. Validate two-device edits, offline changes, account changes, large assets,
-   and mixed app versions.
+4. Validate edits across two and three supported iPhones, offline changes,
+   account changes, large assets, and mixed app versions.
 5. Commit to production only after the prototype converges deterministically.
 
-#### Phase 34 — Structured Journal Sync
+#### Phase 32 — Structured Journal Sync
 
 1. Add a distinct, explicit cross-device sync opt-in and migration preview.
 2. Migrate existing structured data in deterministic, idempotent batches while
@@ -665,7 +649,7 @@ mixing unrelated product work.
 6. Test concurrent edits, source deletion, cascade invalidation, offline work,
    and eventual convergence.
 
-#### Phase 35 — Audio Asset Sync
+#### Phase 33 — Audio Asset Sync
 
 1. Implement the validated CloudKit asset strategy for original recordings.
 2. Add transfer priority, progress, quota, cancellation, retry, and recoverable
@@ -676,7 +660,7 @@ mixing unrelated product work.
 5. Test large libraries, interrupted transfers, low local storage, quota
    exhaustion, and repeated device replacement.
 
-#### Phase 36 — Sync Conflicts and Version 1.2 Hardening
+#### Phase 34 — Sync Conflicts and Version 1.2 Hardening
 
 1. Resolve duplicate, rename, transcript-edit, derived-data, and deletion
    conflicts consistently.
@@ -684,15 +668,15 @@ mixing unrelated product work.
    another device.
 3. Implement the agreed backup/sync relationship and local/cloud retention
    behavior.
-4. Stress-test mixed app versions, repeated account changes, three-device
+4. Stress-test mixed app versions, repeated account changes, three-iPhone
    convergence, opt-out, and re-enable flows.
 5. Promote schema changes only after migration, conflict, retention, and
    destructive tests pass.
-6. Run TestFlight validation and ship the iPad and sync release.
+6. Run TestFlight validation and ship the sync release.
 
 ### Version 1.3 — Source-traceable Yearly Reflections
 
-#### Phase 37 — Yearly Reflection Foundation
+#### Phase 35 — Yearly Reflection Foundation
 
 1. Define yearly eligibility, coverage, and calendar-boundary rules.
 2. Build bounded input from current per-entry summaries and weekly and monthly
@@ -708,7 +692,7 @@ mixing unrelated product work.
 7. Mark the result stale after source edits or deletion and test sparse,
    incomplete, edited, and deleted source years.
 
-#### Phase 38 — Private Cloud Compute Feasibility
+#### Phase 36 — Private Cloud Compute Feasibility
 
 1. Confirm a stable, App Store-eligible API and obtain the managed PCC
    entitlement.
@@ -721,7 +705,7 @@ mixing unrelated product work.
 5. Prototype quota, timeout, offline, refusal, and on-device fallback behavior.
 6. Make a documented go/no-go decision before building the shipping experience.
 
-#### Phase 39 — PCC Yearly Reflection Experience
+#### Phase 37 — PCC Yearly Reflection Experience
 
 1. Keep on-device yearly generation available and make PCC a separate,
    off-by-default enhancement.
@@ -739,12 +723,12 @@ mixing unrelated product work.
 
 ### Later
 
-#### Phase 40 — Optional Advanced Visuals
+#### Phase 38 — Optional Advanced Visuals
 
 1. Define the user-facing outcome and accessibility constraints for a proposed
    effect.
 2. Prototype it with SwiftUI, Canvas, or Core Animation first.
-3. Profile the prototype on the oldest supported iPhone and iPad.
+3. Profile the prototype on the oldest supported iPhone.
 4. Introduce Metal only if measurements demonstrate a concrete need.
 5. Validate battery, thermal behavior, contrast, and Reduce Motion before
    shipping.

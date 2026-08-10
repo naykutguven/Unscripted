@@ -19,11 +19,14 @@ The root [AGENTS.md](../../AGENTS.md) and README contracts remain authoritative.
 - Scheme: `Unscripted`
 - Targets: `Unscripted`, `UnscriptedTests`, `UnscriptedUITests`
 - Configurations: Debug and Release
-- Platform: iPhone, iOS 26.0+
+- Platform: iPhone only, iOS 26.0+; iPad and iPadOS are unsupported
 - Build system: Xcode project, not SwiftPM
 - Unit/integration tests: Swift Testing
 - UI, launch, and metrics: XCTest/XCUITest
 - No committed CI, shared scheme, test plan, linter, or formatter
+
+Use only supported iPhone destinations and device matrices. Do not add iPad
+Simulator destinations, iPad physical-device gates, or iPad-specific UI tests.
 
 Before adding CI or a test plan, commit the shared scheme at
 `Unscripted.xcodeproj/xcshareddata/xcschemes/Unscripted.xcscheme`.

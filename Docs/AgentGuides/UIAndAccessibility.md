@@ -18,6 +18,10 @@ and [App Review Guidelines](https://developer.apple.com/app-store/review/guideli
 
 ## View and presentation design
 
+- Design and validate for supported iPhone screen sizes and orientations. Do not
+  add iPad navigation or layouts, multiwindow UI, Split View, Stage Manager,
+  pointer behavior, or iPad-specific keyboard interactions. Responsive layout
+  remains required for iPhone sizes, localization, and Dynamic Type.
 - Views render state and send intents. They do not coordinate SwiftData, files,
   audio, speech, purchases, and network work.
 - Presentation state is normally an `@MainActor @Observable` type owned at the
