@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct UnscriptedApp: App {
+    // TODO: Build it via AppComposition / AppComposer in the future
+    @State private var router: AppRouter = .init()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRootView()
+                .environment(\.router, router)
         }
     }
 }

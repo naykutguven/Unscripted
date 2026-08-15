@@ -78,15 +78,34 @@ working tree. Hidden Finder files are intentionally omitted.
 
 ```text
 Unscripted/
+├── App/
+│   ├── Navigation/
+│   │   ├── AppRootView.swift                ✅
+│   │   ├── AppRoute.swift                   ✅
+│   │   ├── AppRouter.swift                  ✅
+│   │   ├── AppTab.swift                     ✅
+│   │   └── AppTabBar.swift                  ✅
+│   └── UnscriptedApp.swift                  ✅
 ├── Assets.xcassets/                         ✅
-├── ContentView.swift                        🧹
+├── Extensions/
+│   └── EnvironmentValues+Dependencies.swift ✅
 ├── Features/
-│   └── Navigation/
-│       └── JournalTabBar.swift              🔀
+│   ├── Calendar/
+│   │   └── CalendarView.swift               ✅
+│   ├── Journal/
+│   │   ├── EntryDetail/
+│   │   │   └── EntryDetailView.swift        ✅
+│   │   └── JournalView.swift                ✅
+│   ├── Recording/
+│   │   └── RecordingView.swift              ✅
+│   ├── Reflections/
+│   │   └── ReflectionsView.swift            ✅
+│   ├── Search/
+│   │   └── SearchView.swift                 ✅
+│   └── Settings/
+│       └── SettingsView.swift               ✅
 ├── Info.plist                               ✅
-├── Item.swift                               🧹
-├── Unscripted.entitlements                  ✅
-└── UnscriptedApp.swift                      🔀
+└── Unscripted.entitlements                  ✅
 
 UnscriptedTests/
 └── UnscriptedTests.swift                    🧹
@@ -96,12 +115,16 @@ UnscriptedUITests/
 └── UnscriptedUITestsLaunchTests.swift       🧹
 ```
 
-`UnscriptedApp.swift` currently lives at the target root. Its destination is
-`App/UnscriptedApp.swift` once an app composition boundary is introduced.
-`JournalTab` is currently declared inside `JournalTabBar.swift`, and the file
-currently lives under `Features/Navigation/`. App-wide tab routing belongs under
-`App/Navigation/`. These moves are organizational follow-up work, not changes
-performed by this document.
+`UnscriptedApp` creates and injects the long-lived `AppRouter`, then presents
+`AppRootView`. The root view owns the app-wide `NavigationStack`, destination
+registration, title, and toolbar; `AppTabBar` separately owns the native
+`TabView`. `AppTab` defines root-tab identity and presentation metadata, while
+`AppRoute` defines typed push destinations.
+
+The feature views in this snapshot are navigation placeholders. Their files and
+ownership boundaries exist, but their roadmap behavior is not implemented by
+the navigation scaffold. Content-bearing routes must evolve to carry stable
+domain IDs rather than live SwiftData models before they navigate to real data.
 
 ## Destination layout
 
@@ -110,17 +133,17 @@ performed by this document.
 
 | Status | Path | Responsibility |
 | --- | --- | --- |
-| 🔀 | `UnscriptedApp.swift` | The `@main` entry point. Creates the composition, installs dependencies, and presents the root scene. It currently exists at `Unscripted/UnscriptedApp.swift`. |
+| ✅ | `UnscriptedApp.swift` | The `@main` entry point. Creates the current app-wide router, installs it in the environment, and presents the root scene. Broader capability construction moves into `AppComposition` as those services are implemented. |
 | 🗓️ | `Composition/` | Construction and dependency wiring for long-lived application capabilities. |
 | 🗓️ | `Composition/AppComposition.swift` | Creates the persistence owner, file store, recorder, player, audio-session coordinator, entitlement owner, and other long-lived services once. It is not a runtime service locator. |
 | 🗓️ | `Lifecycle/` | App-wide foreground, background, activation, and termination coordination. |
 | 🗓️ | `Lifecycle/AppLifecycleModel.swift` | Routes lifecycle events to the services that own the affected state without duplicating recorder, player, or lock state. |
-| 🗓️ | `Navigation/` | Root tabs, typed destinations, navigation restoration, and validated deep links. |
-| 🗓️ | `Navigation/AppRoute.swift` | Typed app destinations carrying stable domain IDs rather than live SwiftData models. |
-| 🗓️ | `Navigation/AppNavigationModel.swift` | `@MainActor` owner of app-wide paths, selected tab, sheets, and full-screen presentation. |
-| 🗓️ | `Navigation/AppShellView.swift` | Root visible shell containing navigation stacks, the tab bar, app-level overlays, and an optional compact player. |
-| 🔀 | `Navigation/JournalTab.swift` | Identity and presentation metadata for root tabs. It is currently declared inside `Features/Navigation/JournalTabBar.swift`. |
-| 🔀 | `Navigation/JournalTabBar.swift` | Renders root tab selection and the record action. It currently exists at `Features/Navigation/JournalTabBar.swift`. |
+| ✅ | `Navigation/` | Root tabs and typed destinations. Navigation restoration and validated deep links remain planned. |
+| ✅ | `Navigation/AppRoute.swift` | Defines typed push destinations. Content-bearing destinations carry stable domain IDs rather than live SwiftData models once their domain identities exist. |
+| ✅ | `Navigation/AppRouter.swift` | Main-actor app-wide navigation owner for selected tab, navigation path, navigation actions, and destination resolution. Restoration, sheets, and full-screen presentation remain future extensions. |
+| ✅ | `Navigation/AppRootView.swift` | Root visible shell containing the navigation stack, destination registration, app toolbar, and `AppTabBar`. Future app-level overlays and an optional compact player belong here. |
+| ✅ | `Navigation/AppTab.swift` | Identity and presentation metadata for the native root tabs. |
+| ✅ | `Navigation/AppTabBar.swift` | Renders the Journal, Calendar, Reflections, and Search roots using the native `TabView`. |
 | 🗓️ | `Navigation/DeepLink.swift` | Parses URLs and notification responses into validated, privacy-safe app routes. |
 | 🗓️ | `Privacy/` | App-level presentation boundaries that protect every feature at once. |
 | 🗓️ | `Privacy/AppPrivacyGate.swift` | Replaces private visible and accessibility content while App Lock is engaged and coordinates privacy-safe app-switcher presentation. |
@@ -150,11 +173,11 @@ Apple-framework integration stays in `Services/`.
 
 | Status | Path | Responsibility |
 | --- | --- | --- |
-| 🗓️ | `JournalView.swift` | Displays bounded, paged entry snapshots grouped by local calendar day. |
+| ✅ | `JournalView.swift` | Current placeholder root for the Journal tab; it will display bounded, paged entry snapshots grouped by local calendar day when the journal phase is implemented. |
 | 🗓️ | `JournalModel.swift` | Owns loading, empty, error, grouping, rename, delete, and navigation presentation for the library. |
 | 🗓️ | `Components/` | Journal-only rows, day headers, transcript-state labels, and bounded metadata chips. |
-| 🗓️ | `EntryDetail/` | User experience for one stable journal-entry ID. |
-| 🗓️ | `EntryDetail/EntryDetailView.swift` | Presents recording metadata, playback, transcript status, insights, summaries, and entry actions. |
+| ✅ | `EntryDetail/` | Destination folder for the user experience for one stable journal-entry ID. |
+| ✅ | `EntryDetail/EntryDetailView.swift` | Current placeholder destination; it will present recording metadata, playback, transcript status, insights, summaries, and entry actions. |
 | 🗓️ | `EntryDetail/EntryDetailModel.swift` | Coordinates presentation for an immutable entry snapshot and reacts safely to edits or deletion. |
 | 🗓️ | `EntryDetail/Components/` | Components used only within entry detail. |
 
@@ -165,7 +188,7 @@ Apple-framework integration stays in `Services/`.
 
 | Status | Path | Responsibility |
 | --- | --- | --- |
-| 🗓️ | `RecordingView.swift` | Presents ready, recording, interrupted, finalizing, completed, and recoverable failure states. |
+| ✅ | `RecordingView.swift` | Current placeholder destination; it will present ready, recording, interrupted, finalizing, completed, and recoverable failure states. |
 | 🗓️ | `RecordingModel.swift` | Maps the recorder owner's state into UI state and handles explicit start, stop, resume, cancel, and retry intents. |
 | 🗓️ | `MicrophonePermissionView.swift` | Gives contextual microphone education, denial fallback, and a Settings route where appropriate. |
 | 🗓️ | `Components/` | Recording-only controls, elapsed-time presentation, interruption notices, and semantic status indicators. |
@@ -200,7 +223,7 @@ Apple-framework integration stays in `Services/`.
 
 | Status | Path | Responsibility |
 | --- | --- | --- |
-| 🗓️ | `JournalCalendarView.swift` | Marks dates containing entries and displays entries for the selected date. |
+| ✅ | `CalendarView.swift` | Current placeholder root for the Calendar tab; it will mark dates containing entries and display entries for the selected date. |
 | 🗓️ | `JournalCalendarModel.swift` | Owns selected date and period presentation using explicit calendar, locale, and time-zone values. |
 | 🗓️ | `Components/` | Calendar-only day cells, period headers, and accessible entry indicators. |
 
@@ -222,6 +245,7 @@ Apple-framework integration stays in `Services/`.
 
 | Status | Path | Responsibility |
 | --- | --- | --- |
+| ✅ | `ReflectionsView.swift` | Current placeholder root for the Reflections tab; it will route to reflection history and generation experiences as their phases are implemented. |
 | 🗓️ | `ReflectionHistory/` | History grouped by period, including eligible, not generated, current, stale, and failed states. |
 | 🗓️ | `ReflectionDetail/` | Section presentation, source coverage, source navigation, review, regeneration, editing, and deletion. |
 | 🗓️ | `Weekly/` | Weekly eligibility and generation presentation for version 1.0. |
@@ -237,7 +261,7 @@ Apple-framework integration stays in `Services/`.
 
 | Status | Path | Responsibility |
 | --- | --- | --- |
-| 🗓️ | `JournalSearchView.swift` | Presents query, recent-query, empty, results, and recoverable failure states. |
+| ✅ | `SearchView.swift` | Current placeholder root for the Search tab; it will present query, recent-query, empty, results, and recoverable failure states. |
 | 🗓️ | `JournalSearchModel.swift` | Debounces bounded queries, loads immutable results, clears queries, and routes to source content. |
 | 🗓️ | `Components/` | Search-only fields, result rows, matched context, and result grouping. |
 
@@ -314,7 +338,7 @@ Apple-framework integration stays in `Services/`.
 
 | Status | Path | Responsibility |
 | --- | --- | --- |
-| 🗓️ | `SettingsView.swift` | Routes to privacy, App Lock, device backup, Cloud Backup, sync, reminders, export, and purchase settings. |
+| ✅ | `SettingsView.swift` | Current placeholder settings destination; it will route to privacy, App Lock, device backup, Cloud Backup, sync, reminders, export, and purchase settings. |
 | 🗓️ | `Components/` | Settings-only rows, section content, and explanatory footers. |
 
 Settings links to other capability-owned screens rather than absorbing their
@@ -738,6 +762,7 @@ fonts, semantic colors, SF Symbols, and native controls before custom assets.
 
 | Status | Path | Responsibility |
 | --- | --- | --- |
+| ✅ | `EnvironmentValues+Dependencies.swift` | Defines the SwiftUI environment entry used by composition to inject the app-wide router. Keep entries narrow and do not turn this file into a runtime service locator. |
 | 🗓️ | `TypeName+Extensions.swift` | Naming convention for one narrow native-type extension, such as `Date+JournalGrouping.swift`. |
 
 Domain concepts and multi-type helper logic do not belong here.
